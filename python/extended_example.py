@@ -38,17 +38,17 @@ class Connection(object):
     self.base_url = base_url
     self.username = username
     self.password = password
-
+  
   def request(self, method, url, data = None):
-    # Set authentication parameters
     http = httplib2.Http()
+    
+    # Set authentication parameters
     if self.username and self.password:
       http.add_credentials(self.username, self.password)
-
+    
     url = self.base_url + "/" + url
     headers = { 'Content-Type' : 'application/json' }
-
-    # Send request and get response
+    
     headers, response = http.request(url, method.upper(), data, headers)
     return response
   
@@ -117,10 +117,10 @@ def find_allele(connection, allele):
   params += "&ikmc_project_id=" + allele['ikmc_project_id']
   
   response = connection.request( 'GET', 'alleles.json?' + params )
+  alleles = json.loads(response)
   
   # Check that we have a unique allele - the repository does 
   # handle this for us, but you can't be too cautious!
-  alleles = json.loads(response)
   if len(alleles) > 1:
     raise "Error: found more than one allele for %s | %s!"%(
       allele['ikmc_project_id'], 
